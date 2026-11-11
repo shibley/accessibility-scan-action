@@ -31,6 +31,8 @@ To scan a Vercel/Netlify preview, pass `${{ github.event.deployment_status.targe
 | `fail-on` | `none` | Fail the step if any failing rule has this impact or higher. |
 | `wait-ms` | `1500` | Extra wait after `load`, for client-rendered pages. |
 
+Runs on `ubuntu-latest` (including 26.04) and `ubuntu-24.04`.
+
 ## Outputs
 
 `violations`, `critical`, `serious` (counts of failing rules) and `report` (path to the JSON report, which you can upload with `actions/upload-artifact`).
