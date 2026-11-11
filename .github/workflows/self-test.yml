@@ -1,0 +1,13 @@
+name: self-test
+on: [push, workflow_dispatch]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: a11y
+        uses: ./
+        with:
+          url: https://example.com
+          fail-on: serious
+      - run: echo "violations=${{ steps.a11y.outputs.violations }}"

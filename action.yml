@@ -1,0 +1,48 @@
+name: 'Accessibility Scan (axe-core, WCAG 2.2 AA)'
+description: 'Scan a live URL for WCAG 2.1/2.2 AA failures with axe-core in headless Chromium. Job summary, JSON report, optional fail gate.'
+author: 'RatedWithAI'
+branding:
+  icon: 'eye'
+  color: 'purple'
+inputs:
+  url:
+    description: 'Page URL to scan (e.g. your preview or production URL). Space-separate several URLs.'
+    required: true
+  fail-on:
+    description: 'Fail the step if any violation at or above this impact is found: critical, serious, moderate, minor, or none.'
+    required: false
+    default: 'none'
+  wait-ms:
+    description: 'Extra milliseconds to wait after load before scanning (for client-rendered pages).'
+    required: false
+    default: '1500'
+outputs:
+  violations:
+    description: 'Total number of failing axe rules across all scanned URLs.'
+    value: ${{ steps.scan.outputs.violations }}
+  critical:
+    description: 'Number of failing rules with critical impact.'
+    value: ${{ steps.scan.outputs.critical }}
+  serious:
+    description: 'Number of failing rules with serious impact.'
+    value: ${{ steps.scan.outputs.serious }}
+  report:
+    description: 'Path to the JSON report.'
+    value: ${{ steps.scan.outputs.report }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Install scanner
+      shell: bash
+      run: |
+        cd "$GITHUB_ACTION_PATH"
+        npm install --no-save --no-audit --no-fund --silent playwright@1.58.2 @axe-core/playwright@4.11.1
+        npx --yes playwright@1.58.2 install --with-deps chromium >/dev/null
+    - name: Scan
+      id: scan
+      shell: bash
+      env:
+        A11Y_URLS: ${{ inputs.url }}
+        A11Y_FAIL_ON: ${{ inputs.fail-on }}
+        A11Y_WAIT_MS: ${{ inputs.wait-ms }}
+      run: node "$GITHUB_ACTION_PATH/scan.mjs"
